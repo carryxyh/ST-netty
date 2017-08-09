@@ -1,6 +1,7 @@
 package com.shiwuliang.buf;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
 
 /**
@@ -32,6 +33,19 @@ public class ByteBufDemo {
             //handle...
         }
 
-        
+        CompositeByteBuf messageBuf = Unpooled.compositeBuffer();
+        messageBuf.addComponents(byteBuf, directBuf);
+
+        messageBuf.removeComponent(0);//移除第一个bytebuf
+
+        for (ByteBuf b : messageBuf) {
+            //遍历
+        }
+
+        //访问数据类似于访问直接缓冲
+        int length = messageBuf.readableBytes();
+        byte[] arr = new byte[length];
+        messageBuf.getBytes(messageBuf.readerIndex(), arr);
+        //handle...
     }
 }
