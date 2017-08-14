@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
 
+import java.nio.charset.Charset;
+
 /**
  * ByteBufDemo
  *
@@ -47,5 +49,15 @@ public class ByteBufDemo {
         byte[] arr = new byte[length];
         messageBuf.getBytes(messageBuf.readerIndex(), arr);
         //handle...
+    }
+
+    public void slice() {
+        Charset utf8 = Charset.forName("UTF-8");
+        ByteBuf buf = Unpooled.copiedBuffer("Netty in action rocks !", utf8);
+        ByteBuf slice = buf.slice(0, 15);
+        System.out.println(slice.toString());
+        buf.setByte(0, 'J');
+
+        assert buf.getByte(0) == slice.getByte(0); //这里将会成功，对其中一个做修改，另外一个buf也是可见的
     }
 }

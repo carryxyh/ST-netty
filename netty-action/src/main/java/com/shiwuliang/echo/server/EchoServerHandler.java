@@ -18,7 +18,7 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
         System.out.println(buf.toString(CharsetUtil.UTF_8));
-        //这个时候不会写到套接字里，只会放到
+        //这个时候不会写到套接字里，只会放到/
         // if (buf.isWritable()) {
         //     这里抛出异常，是直接抛出去了，并不会调用exceptionCaught方法。
         //     throw new NullPointerException("buf is null");

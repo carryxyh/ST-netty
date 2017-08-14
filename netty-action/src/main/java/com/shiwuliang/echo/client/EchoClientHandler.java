@@ -16,6 +16,14 @@ public class EchoClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+
+        //从 channel 获取一个ByteBufAllocator
+//        Channel c = ctx.channel();
+//        ByteBufAllocator allocator = c.alloc();
+
+        //ctx获取一个ByteBufAllocator
+//        ByteBufAllocator a = ctx.alloc();
+
         ctx.writeAndFlush(Unpooled.copiedBuffer("Netty rocks!", CharsetUtil.UTF_8));
     }
 
