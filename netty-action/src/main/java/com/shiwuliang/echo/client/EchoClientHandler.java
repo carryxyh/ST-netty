@@ -1,6 +1,7 @@
 package com.shiwuliang.echo.client;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -22,7 +23,13 @@ public class EchoClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 //        ByteBufAllocator allocator = c.alloc();
 
         //ctx获取一个ByteBufAllocator
-//        ByteBufAllocator a = ctx.alloc();
+        ByteBufAllocator a = ctx.alloc();
+
+        ByteBuf b = a.directBuffer();
+        assert b.refCnt() == 1;
+
+        //减少该对象的活动引用，当减少到0时，该对象释放，并且方法返回true
+        boolean released = b.release();
 
         ctx.writeAndFlush(Unpooled.copiedBuffer("Netty rocks!", CharsetUtil.UTF_8));
     }
