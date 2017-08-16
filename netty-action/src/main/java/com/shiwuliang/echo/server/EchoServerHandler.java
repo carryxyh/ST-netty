@@ -41,7 +41,7 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
-        System.out.println(buf.toString(CharsetUtil.UTF_8));
+        System.out.println("-----------" + buf.toString(CharsetUtil.UTF_8));
         //这个时候不会写到套接字里，只会放到缓冲区
 //        if (buf.isWritable()) {
 //            //这里抛出异常，是直接抛出去了，并不会调用exceptionCaught方法。
@@ -52,7 +52,8 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(new ChannelFutureListener() {
+//        ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(new ChannelFutureListener() {
+        ctx.writeAndFlush(Unpooled.copiedBuffer("server read complete..", CharsetUtil.UTF_8)).addListener(new ChannelFutureListener() {
             public void operationComplete(ChannelFuture future) throws Exception {
                 System.out.println("channel is closing...");
                 future.channel().close();
