@@ -16,3 +16,6 @@ netty大块来说有两种buf，一种分配在堆内存中，一种分配在堆
 
 关于ChannelHandlerContext：
 每当有ChannelHandler被添加到ChannelPipeline中，都会创建一个ChannelHandlerContext，二者之间的绑定关系是永远不会改变的，所以可以缓存某个ChannelHandler的ChannelHandlerContext。但是一个channelHandler可以被安装到多个ChannelPipeline中，但是需要加@Sharable注解。
+
+关于netty的异常处理：
+如果入站处理中出现了异常，异常会像所有入站事件一样向后传递，如果一直传递到底都没有被处理，那么netty将会warn级别记录，并且尝试释放该异常。
