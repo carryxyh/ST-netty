@@ -15,4 +15,4 @@ netty大块来说有两种buf，一种分配在堆内存中，一种分配在堆
 2.分配在堆内存中的，byteBuf.hasArray()将会返回true，说明在堆内存中有一个`支持数组`。
 
 关于ChannelHandlerContext：
-每当有ChannelH
+每当有ChannelHandler被添加到ChannelPipeline中，都会创建一个ChannelHandlerContext，二者之间的绑定关系是永远不会改变的，所以可以缓存某个ChannelHandler的ChannelHandlerContext。
