@@ -14,11 +14,28 @@ import io.netty.util.CharsetUtil;
 @ChannelHandler.Sharable
 public class EchoServerHandler extends ChannelInboundHandlerAdapter {
 
+    private ChannelHandlerContext ctx;
+
     //这里，每次一个EchoServerHandler被安装到ChannelPipeline中，都会触发这个方法。
+    //如下所示，我们可以把这个ctx缓存到全局变量中，然后在别的地方调用这个ctx
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-        super.handlerAdded(ctx);
-        System.out.println("handlerAdded is done...");
+        if (this.ctx == null) {
+            this.ctx = ctx;
+        } else {
+            /**
+             * false这里输出了false，说明创建了新的ctx，就算是同一个EchoServerHandler，这里把添加EchoServerHandler的代码拿过来看一下
+             *
+             * final EchoServerHandler serverHandler = new EchoServerHandler();
+             * ...
+             * ch.pipeline().addLast(serverHandler).addFirst(serverHandler);
+             * ...
+             *
+             * 我们可以看到，我们像管道中添加了同一个EchoServerHandler，但是这里输出false，说明第二次添加也产生了ctx，所以如果需要缓存ctx，要每次添加一个新的EchoServerHandler
+             */
+            System.out.println(this.ctx == ctx);
+        }
+        System.out.println(ctx);
     }
 
     @Override
