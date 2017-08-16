@@ -14,6 +14,13 @@ import io.netty.util.CharsetUtil;
 @ChannelHandler.Sharable
 public class EchoServerHandler extends ChannelInboundHandlerAdapter {
 
+    //这里，每次一个EchoServerHandler被安装到ChannelPipeline中，都会触发这个方法。
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        super.handlerAdded(ctx);
+        System.out.println("handlerAdded is done...");
+    }
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;

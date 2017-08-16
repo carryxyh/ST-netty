@@ -28,6 +28,7 @@ public class EchoServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
 
                     protected void initChannel(SocketChannel ch) throws Exception {
+//                        ch.pipeline().addLast(serverHandler).addFirst(serverHandler);
                         ch.pipeline().addLast(serverHandler);
 //                        throw new RuntimeException("run time ex...");
                     }
