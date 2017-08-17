@@ -19,3 +19,54 @@ netty大块来说有两种buf，一种分配在堆内存中，一种分配在堆
 
 关于netty的异常处理：
 如果入站处理中出现了异常，异常会像所有入站事件一样向后传递，如果一直传递到底都没有被处理，那么netty将会warn级别记录，并且尝试释放该异常。
+
+关于netty的EventLoop：
+Netty in action这本书中讲的是：一个EventLoop由一个线程来支撑，这个我翻了一下源码，看到的确实是这个样子。后面接着说：如果提交任务的线程就是支撑EventLoop的线程，那么任务将直接被执行；如果不是，那么EventLoop将调度该任务以便稍后执行，并将它放到内部的队列中。
+这个队列是个LinkedBlockingQueue，我把DefaultEventLoop的execute方法（继承自SingleThreadEventExecutor）拿出来：
+
+``
+@Override
+public void execute(Runnable task) {
+    if (task == null) {
+        throw new NullPointerException("task");
+    }
+    boolean inEventLoop = inEventLoop();
+    if (inEventLoop) {
+        addTask(task);
+    } else {
+        startThread();
+        addTask(task);
+        if (isShutdown() && removeTask(task)) {
+            reject();
+        }
+    }
+    if (!addTaskWakesUp && wakesUpForTask(task)) {
+        wakeup(inEventLoop);
+    }
+}
+``
+
+再看看inEventLoop方法：
+
+``
+@Override
+public boolean inEventLoop(Thread thread) {
+    //这里我省略了一个方法，入参的thread是从Thread.currentThread()方法返回的，即当前线程
+    return thread == this.thread;
+}
+``
+
+这么来看我们可以看到，应该是：是支撑EventLoop的线程，把任务放到队列中，不是的直接执行。不知道是作者笔误？
+
+
+
+
+
+
+
+
+
+
+
+
+
