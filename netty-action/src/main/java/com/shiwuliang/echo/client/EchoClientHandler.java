@@ -8,6 +8,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.CharsetUtil;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * EchoClientHandler
  *
@@ -61,9 +63,8 @@ public class EchoClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
         @Override
         public void run() {
-            c.eventLoop().execute(() -> {
-                System.out.println("A client handler is over...");
-            });
+            c.eventLoop().schedule(() -> System.out.println("schedule is doing..."), 10, TimeUnit.SECONDS);
+            c.eventLoop().execute(() -> System.out.println("A client handler is over..."));
         }
     }
 }
