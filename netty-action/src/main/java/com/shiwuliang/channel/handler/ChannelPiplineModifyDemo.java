@@ -5,6 +5,9 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.concurrent.ScheduledFuture;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * ChannelPiplineModifyDemo
@@ -29,6 +32,12 @@ public class ChannelPiplineModifyDemo extends SimpleChannelInboundHandler<ByteBu
 
         pipeline.remove("handler3");
         pipeline.replace("handler2", "handler4", new SecondHandler());
+
+
+        //EventLoop的一些用法，EventLoop跟我们JUC中的Executor功能非常相似，看源码就知道，其实就是继承自Executor
+        ScheduledFuture<?> future = c.eventLoop().schedule(() -> System.out.println("Netty rocks!"), 60, TimeUnit.SECONDS);
+        //参数的含义是，需不需要中断这个任务，false 会让任务执行完
+        future.cancel(true);
     }
 }
 
