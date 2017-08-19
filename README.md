@@ -59,7 +59,15 @@ public boolean inEventLoop(Thread thread) {
 这么来看我们可以看到，应该是：是支撑EventLoop的线程，把任务放到队列中，不是的直接执行。不知道是作者笔误？
 继续debug了一下netty，我发现，startThread()这个方法的调用是在AbstractChannel初始化的时候就执行了的，这个时候整个线程以及跑起来了，所以这个时候只要添加任何一个任务，就会直接拿出来执行，不知道作者的意思是不是这样的。但是其实还有一个问题，如果这个时候taskQueue中不是空的，那么就算调用任务的线程是支撑EventLoop的线程，这个任务也不会马上执行(因为这个任务不管怎么样都是在taskQueue中)，只能保证比其他别的线程调用的任务稍微快一点点执行（其他线程的任务要先调用startThread这个方法）。
 
-
+关于Netty的传输类型和EventLoopGroup：
+我们看一下这种代码：
+``
+EventLoopGroup e = new NioEventLoopGroup();
+BootStrap b = new BootStrap();
+b.channel(OioSocketChannel.class)
+...
+``
+以上这段代码将会报错，因为我们选用不兼容的传输。BootStrap.handler方法尤其重要，因为它要配置好ChannelPipeline。
 
 
 
