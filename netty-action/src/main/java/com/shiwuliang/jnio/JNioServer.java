@@ -55,7 +55,6 @@ public class JNioServer {
                         client.configureBlocking(false);
                         client.register(selector, SelectionKey.OP_WRITE | SelectionKey.OP_READ, msg);
                     }
-
                     if (k.isWritable()) { //检查套接字是否已经准备好写数据
                         SocketChannel client = (SocketChannel) k.channel();
                         ByteBuffer buffer = (ByteBuffer) k.attachment();
