@@ -45,7 +45,6 @@ public class JNioServer {
             while (iter.hasNext()) {
                 SelectionKey k = iter.next();
                 iter.remove();
-
                 try {
                     if (k.isAcceptable()) {
                         ServerSocketChannel server = (ServerSocketChannel) k.channel();
