@@ -79,6 +79,8 @@ Future<?> f = group.shutdownGracefully();
 f.syncUninterruptibly();
 ``
 
+###关于netty的解码器的一些细节：
+对于编码器和解码器来说，一旦消息被编码或者解码，它就会被ReferenceCountUtil.release(message)调用自动释放。如果不想消息被释放，可以调用ReferenceCountUtil.retain(message)增加引用计数。
 
 
 
