@@ -69,6 +69,15 @@ b.channel(OioSocketChannel.class)
 ``
 以上这段代码将会报错，因为我们选用不兼容的传输。BootStrap.handler方法尤其重要，因为它要配置好ChannelPipeline。
 
+###Netty的优雅关闭：
+``
+EventLoopGroup group = new NioEventLoopGroup();
+Bootstrap b = new Bootstrap();
+b.group(group)...
+
+Future<?> f = group.shutdownGracefully();
+f.syncUninterruptibly();
+``
 
 
 
