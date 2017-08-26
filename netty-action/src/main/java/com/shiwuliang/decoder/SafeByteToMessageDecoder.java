@@ -25,4 +25,14 @@ public class SafeByteToMessageDecoder extends ByteToMessageDecoder {
             throw new TooLongFrameException("Frame too big");
         }
     }
+
+    /**
+     * 解码器有时候需要在channel关闭之后产生一个消息，所以有了这个方法
+     * 但是编码器不会有，因为channel我们再产生一个消息是没有意义的（channel关闭，没法写出去）
+     */
+    @Override
+    protected void decodeLast(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        System.out.println("decode last");
+        super.decodeLast(ctx, in, out);
+    }
 }
