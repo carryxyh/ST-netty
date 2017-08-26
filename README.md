@@ -74,9 +74,8 @@ b.channel(OioSocketChannel.class)
 EventLoopGroup group = new NioEventLoopGroup();
 Bootstrap b = new Bootstrap();
 b.group(group)...
-
 Future<?> f = group.shutdownGracefully();
-f.syncUninterruptibly();
+f.syncUninterruptibly()
 ``
 
 ### 关于netty的解码器的一些细节：
