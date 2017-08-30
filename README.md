@@ -81,6 +81,20 @@ f.syncUninterruptibly()
 ### 关于netty的解码器的一些细节：
 对于编码器和解码器来说，一旦消息被编码或者解码，它就会被ReferenceCountUtil.release(message)调用自动释放。如果不想消息被释放，可以调用ReferenceCountUtil.retain(message)增加引用计数。
 
+### 关于netty中的WebSocket：
+WebSocketServerHandshaker有好多种实现，比如WebSocketServerHandshaker13，就是13版的WebSocket实现。WebSocketServerProtocolHandler按照WebSocket规范的要求，处理WebSocket升级握手、PingWebSocketFrame、PongWebSocketFrame和CloseWebSocketFrame。
+WebSocket升级之前的ChannelPipeline中的状态：（这里只是根据我们的例子中的handler）
+
+HtthRequestDecoder -> HttpResponseEncoder -> HttpObjectAggregator 
+-> HttpRequestHandler -> WebSocketServerProtocolHandler
+-> TextWebSocketFrameHandler
+
+HttpObjectAggregator:将一个HttpMessage和跟随它的多个HttpContent聚合为单个FullHttpRequest或者FullHttpResponse（取决于它是被用来处理请求还是响应）。安装这个之后，ChannelPipeline中的下一个ChannelHandler将只会收到完整的HTTP请求或响应。
+
+WebSocket协议升级完成之后，WebSocketServerProtocolHandler将会把HttpRequestDecoder替换为WebSocketFrameDecoder，把HTTPResponseEncoder替换为WebSocketFrameEncoder。为了性能最大化，它将移除任何不再被WebSocket连接所需要的ChannelHandler。也包含了HttpObjectAggregator和HttpRequestHandler。Netty根据客户端支持的版本，自动选择WebSocketFrameEncoder和Decoder，下面是升级之后的Pipeline：
+WebSocketFrameDecoder13 -> WebSocketFrameEncoder13
+-> WebSocketServerProtocolHandler -> TextWebSocketFrameHandler
+（假设我们选用13版的WebSocket协议）
 
 
 
