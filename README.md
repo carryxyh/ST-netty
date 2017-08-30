@@ -96,6 +96,8 @@ WebSocketFrameDecoder13 -> WebSocketFrameEncoder13
 -> WebSocketServerProtocolHandler -> TextWebSocketFrameHandler
 （假设我们选用13版的WebSocket协议）
 
+### 关于WebSocket的握手：
+我们上文说道WebSocketServerProtocolHandler会做很多替换Handler和移除Handler的方法，WebSocketServerProtocolHandler重写了handlerAdded方法，会在管道中添加一个WebSocketServerProtocolHandshakeHandler，这个方法在channelRead的时候会执行握手`handshaker.handshake`，这个handshaker是WebSocketServerHandshaker的实体，我们可以看到这个握手过程中，会进行handler的替换、移除。
 
 
 
