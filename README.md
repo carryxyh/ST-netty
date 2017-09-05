@@ -99,7 +99,8 @@ WebSocketFrameDecoder13 -> WebSocketFrameEncoder13
 ### 关于WebSocket的握手：
 我们上文说道WebSocketServerProtocolHandler会做很多替换Handler和移除Handler的方法，WebSocketServerProtocolHandler重写了handlerAdded方法，会在管道中添加一个WebSocketServerProtocolHandshakeHandler，这个方法在channelRead的时候会执行握手`handshaker.handshake`，这个handshaker是WebSocketServerHandshaker的实体，我们可以看到这个握手过程中，会进行handler的替换、移除。
 
-
+### 关于WebSocket的Idle状态：
+触发IdleStateEvent的是IdleStateHandler，这个Handler的channelActive、channelRegistried和handlerAdded的时候schedule一个Task，不停地来触发IdleStateEvent。
 
 
 
