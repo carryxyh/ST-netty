@@ -102,6 +102,8 @@ WebSocketFrameDecoder13 -> WebSocketFrameEncoder13
 ### 关于WebSocket的Idle状态：
 触发IdleStateEvent的是IdleStateHandler，这个Handler的channelActive、channelRegistried和handlerAdded的时候schedule一个Task，不停地来触发IdleStateEvent。
 
-
+### 关于Netty的bind过程：
+ServerBootStrap为例（简称sbs），new一个sbs的时候，什么也不会做，但是在调用sbs的channel方法的时候，会初始化ChannelFactory，默认用的是ReflectiveChannelFactory。bind的时候会初始化一个channel，这个channel是从ChannelFactory中创建出来的，然后在initAndRegister中调用：
+`ChannelFuture regFuture = config().group().register(channel);`这里这个group方法返回的就是group方法传入的EventLoopGroup。这就会在EventLoopGroup中注册一个Channel。我们以NioEventLoopGroup为例，调用了父类MultithreadEventLoopGroup的register方法，这里会先使用EventExecutorChooser来选择一个EventLoop，然后调用EventLoop的Channel注册到一个EventLoop钟，这就是我们之前说的，一个EventLoop会绑定很多Channel，但是一个Channel只会绑在一个EventLoop上。
 
 
