@@ -21,6 +21,5 @@
             <artifactId>netty-all</artifactId>
             <version>4.1.9.Final</version>
         </dependency>
-
     </dependencies>
 </project>
