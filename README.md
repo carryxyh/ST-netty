@@ -106,4 +106,9 @@ WebSocketFrameDecoder13 -> WebSocketFrameEncoder13
 ServerBootStrap为例（简称sbs），new一个sbs的时候，什么也不会做，但是在调用sbs的channel方法的时候，会初始化ChannelFactory，默认用的是ReflectiveChannelFactory。bind的时候会初始化一个channel，这个channel是从ChannelFactory中创建出来的，然后在initAndRegister中调用：
 `ChannelFuture regFuture = config().group().register(channel);`这里这个group方法返回的就是group方法传入的EventLoopGroup。这就会在EventLoopGroup中注册一个Channel。我们以NioEventLoopGroup为例，调用了父类MultithreadEventLoopGroup的register方法，这里会先使用EventExecutorChooser来选择一个EventLoop，然后调用EventLoop的Channel注册到一个EventLoop中，这就是我们之前说的，一个EventLoop会绑定很多Channel，但是一个Channel只会绑在一个EventLoop上。
 
-
+### 关于EPOLL：
+epoll：
+1. 初始化的时候，向内核申请一块区域，存储被监控的句柄文件(linux中一切皆文件，进程需要操作文件，句柄就是把进程和文件关联起来的东西)。调用epoll_create时，会在这个区域中创建file节点，同时epoll会开辟一块告诉缓存区，以红黑树在缓存中保存这些被监控的句柄。然后还会创建一个list链表，用于存储准备就绪的事件（epoll和poll，就差了个e，这个e就是event）
+2. 把socket句柄放到epoll创建的内核区域的file节点红黑树上的时候，会给内核注册一个回调函数，如果句柄发生中断，就把句柄放到list链表中。当一个socket上有数据到了，内核在把网卡上的数据copy到内核中后，就把socket插入到就绪链表里。
+3. epoll会观察链表里有没有数据，有就返回，否则就sleep指定时间。一直没有也返回。
+总结一下：epoll用红黑树存储被监听的句柄。这个红黑树在高速缓存和文件系统中都有。然后还维护的了一个准备就绪的链表集合，增加被监听的句柄的时候，通过回调让内核把中断的句柄加入到这个集合中。epoll仅仅观察这个链表中有没有数据，有就返回数据，没有就sleep，但是只会sleep指定时间。
