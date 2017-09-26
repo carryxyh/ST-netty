@@ -116,3 +116,14 @@ epoll：
 ### 关于NIO socket：
 服务端的demo请看JNioServerDemo2.java。SocketChannel、ServerSocketChannel和Selector的实例初始化都通过SelectorProvider类实现，其中Selector是整个NIO Socket的核心实现。以KQueueSelectorImpl为例，初始化的时候初始化一个kqueueWrapper和fdMap，这个map的键就是被监听的句柄，值是MapEntry，这个MapEntry就是一个SelectionKeyImpl的包装类，同时记住个这个KEY被修改的次数。doSelect是通过kqueueWrapper的poll方法。
 implRegister方法则会把SelectionKeyImpl和其绑定的channel的句柄放到这个map中。
+
+### 关于NioEventLoop的启动流程：
+我们在bind中说过，最终实际是把一个channel注册到了一个EventLoop上，我们看一下AbstractChannel的`register(EventLoop eventLoop, final ChannelPromise promise)`，这个方法中，有一段代码：
+<br/>
+if (eventLoop.inEventLoop()) {
+    register0(promise);
+} else {
+    try {
+        eventLoop.execute(new Runnable() {....}
+第一次执行inEventLoop肯定会返回false，因为这个EventLoop被创建出来，这个thread还没有绑定。这个thread被绑定是在SingleThreadEventExecutor.doStartThread这个方法中。
+我们看eventLoop.execute这个方法的实现，第一次执行inEventLoop一定返回false，所以会调用startThread，这个方法中会调用自己的run方法，run最终会执行NioEventloop的run，在循环中不停地select并且处理意见select到的键，以及处理taskQueue中的任务。
