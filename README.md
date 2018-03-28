@@ -127,3 +127,24 @@ if (eventLoop.inEventLoop()) {
         eventLoop.execute(new Runnable() {....}
 第一次执行inEventLoop肯定会返回false，因为这个EventLoop被创建出来，这个thread还没有绑定。这个thread被绑定是在SingleThreadEventExecutor.doStartThread这个方法中。
 我们看eventLoop.execute这个方法的实现，第一次执行inEventLoop一定返回false，所以会调用startThread，这个方法中会调用自己的run方法，run最终会执行NioEventloop的run，在循环中不停地select并且处理意见select到的键，以及处理taskQueue中的任务。
+
+
+### 关于Netty的LengthFrameDecoder
+Netty提供`LengthFrameDecoder`来对协议进行解码，目的是解决TCP的拆包粘包问题，我们可以使用这个Decoder对自定义的协议进行解码，而不用关心我们拿到的是否是整包数据。
+构造函数的含义如下：
+
+```java
+/**
+ * @param byteOrder           表示字节流表示的数据是大端还是小端，用于长度域的读取；
+ * @param maxFrameLength      表示的是包的最大长度，超出包的最大长度netty将会做一些特殊处理
+ * @param lengthFieldOffset   指的是长度域的偏移量，表示跳过指定长度个字节之后的才是长度域
+ * @param lengthFieldLength   记录该帧数据长度的字段本身的长度
+ * @param lengthAdjustment    该字段加长度字段等于数据帧的长度，包体长度调整的大小，长度域的数值表示的长度加上这个修正值表示的就是带header的包 如果为负数，则从Length结束往前推lengthAdjustment个字段一起解析，否则向后解析
+ * @param initialBytesToStrip 从数据帧中跳过的字节数，表示获取完一个完整的数据包之后，忽略前面的指定的位数个字节，应用解码器拿到的就是不带长度域的数据包
+ * @param failFast            如果为true，则表示读取到长度域，TA的值的超过maxFrameLength，就抛出一个 TooLongFrameException，而为false表示只有当真正读取完长度域的值表示的字节之后，才会抛出 TooLongFrameException。
+ *                            默认情况下设置为true，建议不要修改，否则可能会造成内存溢出
+ */
+public LengthFrameDecoder(ByteOrder byteOrder, int maxFrameLength, int lengthFieldOffset, int lengthFieldLength, int lengthAdjustment, int initialBytesToStrip, boolean failFast) {
+    super(byteOrder, maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment, initialBytesToStrip, failFast);
+}
+```
