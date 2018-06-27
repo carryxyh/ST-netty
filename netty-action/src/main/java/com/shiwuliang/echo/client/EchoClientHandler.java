@@ -34,6 +34,9 @@ public class EchoClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
         //减少该对象的活动引用，当减少到0时，该对象释放，并且方法返回true
         boolean released = b.release();
 
+        ctx.write(Unpooled.copiedBuffer("1111111111111111111111111111netty rocks", CharsetUtil.UTF_8));
+        ctx.write(Unpooled.copiedBuffer("2222222222222222222222222222netty rocks", CharsetUtil.UTF_8));
+
         ctx.writeAndFlush(Unpooled.copiedBuffer("Netty rocks!", CharsetUtil.UTF_8));
     }
 
