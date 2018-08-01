@@ -42,6 +42,12 @@ public class EchoClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        ctx.executor().execute(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("陈兆宏说你呢！再这么用就揍你！！！");
+            }
+        });
         Channel c = ctx.channel();
         new Thread(new TestThread(c)).start();
     }
